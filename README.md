@@ -70,6 +70,7 @@ print block infomation in blockchain:
 
 ./nabicoin printchain -address [wallet_address] -blockno [block number]
 
+.
 
 clear stored address:
 
