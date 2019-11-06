@@ -56,7 +56,7 @@ const protocol = "tcp"
 const nodeVersion = 1
 const commandLength = 122
 
-const mainServerIP = "xxx.xx.xxx.xxx"
+const mainServerIP = "xxx.xxx.xxx.xxx"
 const port = "60199"
 const mainServer = mainServerIP + ":" + port
 const key = "xxxxxxxxxxxxxxxx"
