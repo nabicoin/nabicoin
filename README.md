@@ -70,6 +70,11 @@ print block infomation in blockchain:
 
 ./nabicoin printchain
 
+
+clear stored address:
+
+rm -f ./.knownNodes 
+
 .
 
 [Based on 'A simplified blockchain implementation in Golang'](https://github.com/Jeiwan/blockchain_go)
