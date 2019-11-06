@@ -68,7 +68,13 @@ B terminal: ./nabicoin send -from (wallet_address 1) -to (wallet_address 2) -amo
 
 print block infomation in blockchain:
 
-./nabicoin printchain
+./nabicoin printchain -address [wallet_address] -blockno [block number]
+
+.
+
+clear stored address:
+
+rm -f ./.knownNodes 
 
 .
 
