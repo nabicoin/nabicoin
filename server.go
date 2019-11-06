@@ -56,7 +56,7 @@ const protocol = "tcp"
 const nodeVersion = 1
 const commandLength = 122
 
-const mainServerIP = "xxx.xx.xxx.xxx"
+const mainServerIP = "xxx.xxx.xxx.xxx"
 const port = "60199"
 const mainServer = mainServerIP + ":" + port
 const key = "xxxxxxxxxxxxxxxx"
@@ -83,6 +83,8 @@ var mutex = new(sync.Mutex)
 var wg sync.WaitGroup
 var blockWG sync.WaitGroup
 var cryptoBlock, _ = aes.NewCipher([]byte(key))
+var deleteTime = false
+var sendToAddress = mainServerIP + ":" + port
 
 type addr struct {
 	AddrList []string
@@ -763,14 +765,13 @@ func handleVersion(request []byte, bc *Blockchain) {
 		sendGetData(payload.AddrFrom, "block", nil, myBestHeight+1)
 		sendVersion(payload.AddrFrom, bc)
 	} else if myBestHeight > foreignerBestHeight {
-		sendVersion(payload.AddrFrom, bc)
+		//sendVersion(payload.AddrFrom, bc)
 
 		//fmt.Printf("[handle version] send version to %s\n", payload.AddrFrom)
 	} else {
 		sendAddr(payload.AddrFrom)
 		sendGetData(payload.AddrFrom, "addr", nil, 0)
 		sendGetData(payload.AddrFrom, "block", nil, myBestHeight)
-		sendVersion(payload.AddrFrom, bc)
 	}
 
 	if !nodeIsKnown(payload.AddrFrom) {
@@ -982,6 +983,10 @@ func StartServer(minerAddress string) {
 					}
 				} else if bestHeight < 0 {
 					emptyMining(bc)
+				} else if deleteTime == true {
+					emptyMining(bc)
+					deleteTime = false
+					sendVersion(sendToAddress, bc)
 				}
 
 				runtime.Gosched()
@@ -1070,10 +1075,20 @@ func StartServer(minerAddress string) {
 		return c.JSON(http.StatusOK, u)
 	})
 
-	rest.GET("/txinfo/:address", func(c echo.Context) error {
+	rest.GET("/txinfo/:address/:blockno", func(c echo.Context) error {
 		address := c.Param("address")
+		blockHeightStr := c.Param("blockno")
+		blockHeight, err := strconv.Atoi(blockHeightStr)
+		if err != nil {
+			return c.String(http.StatusOK, "blockno fail!")
+		}
+
 		if !ValidateAddress(address) {
-			return c.String(http.StatusOK, "fail!")
+			return c.String(http.StatusOK, "address fail!")
+		}
+
+		if blockHeight < 1 {
+			return c.String(http.StatusOK, "blockno fail!")
 		}
 
 		bci := bc.Iterator()
@@ -1085,12 +1100,14 @@ func StartServer(minerAddress string) {
 				break
 			}
 
-			for _, tx := range block.Transactions {
-				if len(tx.Vin[0].Txid) > 0 {
-					senderAddress := GetAddress(tx.Vout[1].PubKeyHash)
-					receiverAddress := GetAddress(tx.Vout[0].PubKeyHash)
-					if string(senderAddress) == address || string(receiverAddress) == address {
-						txInfos = append(txInfos, tx.GetTxInfo())
+			if block.Height == blockHeight {
+				for _, tx := range block.Transactions {
+					if len(tx.Vin[0].Txid) > 0 {
+						senderAddress := GetAddress(tx.Vout[1].PubKeyHash)
+						receiverAddress := GetAddress(tx.Vout[0].PubKeyHash)
+						if string(senderAddress) == address || string(receiverAddress) == address {
+							txInfos = append(txInfos, tx.GetTxInfo())
+						}
 					}
 				}
 			}

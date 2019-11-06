@@ -133,7 +133,7 @@ func (bc *Blockchain) AddBlock(addr string, block *Block) {
 
 		if block.Height == lastBlock.Height {
 			if lastBlock.Height > 1 {
-				if lastBlock.Timestamp > block.Timestamp {
+				/*if lastBlock.Timestamp > block.Timestamp {
 					fmt.Println("[add block] delete last block")
 
 					err := b.Delete([]byte("l"))
@@ -159,7 +159,7 @@ func (bc *Blockchain) AddBlock(addr string, block *Block) {
 					//fmt.Printf("[add block] delete block %x\n", lastBlock.Hash)
 
 					return nil
-				}
+				}*/
 
 			}
 		}
@@ -215,6 +215,7 @@ func (bc *Blockchain) AddBlock(addr string, block *Block) {
 						if block.Height != 1 {
 							if bytes.Equal(block.PrevBlockHash, lastHash) {
 								log.Println("balance check fail!!!")
+								//deleteTime = true
 								return nil
 							}
 						}		
@@ -314,8 +315,7 @@ func (bc *Blockchain) AddBlock(addr string, block *Block) {
 					}
 				}
 
-				//sendGetData(addr, "block", nil, block.Height-1)
-				sendVersion(addr, bc)
+				sendGetData(addr, "block", nil, block.Height-1)
 
 				//fmt.Printf("[add block] delete block %x\n", lastBlock.Hash)
 
@@ -429,6 +429,8 @@ func (bc *Blockchain) AddBlock(addr string, block *Block) {
 
 		fmt.Printf("[add block] (height : %d)\n", block.Height)
 	}
+
+	//sendVersion(addr, bc)
 }
 
 // FindTransaction finds a transaction by its ID
