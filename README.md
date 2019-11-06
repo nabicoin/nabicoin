@@ -1,10 +1,7 @@
 # nabicoin
+source code update : 2019.11.07 07:00 (South of Korea)
 
-Launch full service!!!!!!!
-
-source code update : 2019.11.04 23:00 (South of Korea)
-
-blockchain reset   : 2019.11.04 23:00 (South of Korea)
+blockchain reset   : 2019.11.05 23:00 (South of Korea)
 
 .
 
@@ -16,6 +13,9 @@ Download Nabi-Coin:
 
 
 [windows user download link](http://114.203.210.120/execute_file/nabicoin_windows.zip)
+
+
+[raspberry-pi 64bit-linux user download link](http://114.203.210.120/execute_file/nabicoin_raspberrypi64.tar.gz)
 
 .
 
