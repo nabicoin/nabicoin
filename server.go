@@ -78,7 +78,7 @@ var mempool = make(map[string]Transaction)
 
 //var storemempool = make(map[string]Transaction)
 var txIDPool = make(map[string]string)
-var blocksInTransit = make(map[int]Block)
+var blocksInTransit = make(map[int]map[int]map[int]Block)
 var mutex = new(sync.Mutex)
 var wg sync.WaitGroup
 var blockWG sync.WaitGroup
@@ -506,8 +506,10 @@ func handleGetData(request []byte, bc *Blockchain) {
 
 		//fmt.Printf("[handleGetData] GetBlockByHeight:%d\n", height)
 		//block, isHave := bc.GetBlockByHeight(height)
-
-		block, isHave := blocksInTransit[height]
+		x := height / 10000
+		y := height / 100 - x
+		z := height % 100
+		block, isHave := blocksInTransit[x][y][z]
 
 		if isHave && (block.Height > 0) {
 			if sendBlock(payload.AddrFrom, &block) {
@@ -899,6 +901,15 @@ func StartServer(minerAddress string) {
 	}()
 
 	//log.Printf("Listen: %s\n", nodeAddress)
+	
+	for idx := 0; idx < 200; idx++ {
+		blocksInTransit[idx] = make(map[int]map[int]Block)
+
+		for idx_y := 0; idx_y < 100; idx_y++ {
+			blocksInTransit[idx][idx_y] = make(map[int]Block)
+		}
+	}
+
 
 	startMiningTime = time.Now()
 	startCleanTime = time.Now()
@@ -926,8 +937,13 @@ func StartServer(minerAddress string) {
 
 	for {
 		block := bci.Next()
+		height := block.Height
 
-		blocksInTransit[block.Height] = *block
+		x := height / 10000
+		y := height / 100 - x
+		z := height % 100
+		
+		blocksInTransit[x][y][z] = *block
 		fmt.Printf("loaded block height: %d\n", block.Height)
 
 		if len(block.Transactions) > 0 {

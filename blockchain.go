@@ -146,7 +146,12 @@ func (bc *Blockchain) AddBlock(addr string, block *Block) {
 						log.Panic(err)
 					}
 
-					delete(blocksInTransit, lastBlock.Height)
+					height := lastBlock.Height
+					x := height / 10000
+					y := height / 100 - x
+					z := height % 100
+		
+					delete(blocksInTransit[x][y], z)
 
 					for _, tx := range block.Transactions {
 						if txIDPool[hex.EncodeToString(tx.ID)] == hex.EncodeToString(tx.ID) {
@@ -273,10 +278,15 @@ func (bc *Blockchain) AddBlock(addr string, block *Block) {
 				newBlockData := b.Get(block.Hash)
 				newBlock := DeserializeBlock(newBlockData)
 
-				blocksInTransit[block.Height] = *newBlock
+				height := newBlock.Height
+				x := height / 10000
+				y := height / 100 - x
+				z := height % 100
+		
+				blocksInTransit[x][y][z] = *newBlock
 
 				if len(blocksInTransit) > maxBlocksOnMemory {
-					for index, _ := range blocksInTransit {
+					for index, _ := range blocksInTransit[x][y] {
 						delete(blocksInTransit, index)
 
 						break
@@ -305,9 +315,14 @@ func (bc *Blockchain) AddBlock(addr string, block *Block) {
 				err = b.Put([]byte("l"), lastBlock.PrevBlockHash)
 				if err != nil {
 					log.Panic(err)
-				}
+				}	
 
-				delete(blocksInTransit, lastBlock.Height)
+				height := lastBlock.Height
+				x := height / 10000
+				y := height / 100 - x
+				z := height % 100
+				
+				delete(blocksInTransit[x][y], z)
 
 				for _, tx := range block.Transactions {
 					if txIDPool[hex.EncodeToString(tx.ID)] == hex.EncodeToString(tx.ID) {
@@ -402,8 +417,12 @@ func (bc *Blockchain) AddBlock(addr string, block *Block) {
 						if err != nil {
 							log.Panic(err)
 						}
-						
-						delete(blocksInTransit, lastBlock.Height)
+						height := lastBlock.Height				
+						x := height / 10000
+						y := height / 100 - x
+						z := height % 100
+		
+						delete(blocksInTransit[x][y], z)
 
 						return nil
 					})
