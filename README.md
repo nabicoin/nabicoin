@@ -78,5 +78,19 @@ rm -f ./.knownNodes
 
 .
 
+REST: 
+
+rest port: 1331
+
+GET : http://localhost:1331/createwallet
+
+GET : http://localhost:1331/balance/[address]
+
+GET : http://localhost:1331/send/[from address]/[to address]/[amount]
+
+GET : http://localhost:1331/txinfo/[address]/[blockno]
+
+.
+
 [Based on 'A simplified blockchain implementation in Golang'](https://github.com/Jeiwan/blockchain_go)
 
